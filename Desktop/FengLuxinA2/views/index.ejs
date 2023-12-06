@@ -1,0 +1,187 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 20px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
+      }
+
+      th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        margin-right: 10px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+      h1{text-align: center;}
+    </style>
+  </head>
+  <body>
+    <h1>Product List</h1>
+    <p>Our company provides everyday products for various groups of people (men, women, teenagers), including clothing and cosmetics.</p>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product Name</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Categories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Woman's Perfume</td>
+          <td>Woman</td>
+        </tr>
+        <tr>
+          <td>Man's Perfume</td>
+          <td>Man</td>
+        </tr>
+        <tr>
+          <td>Blouse</td>
+          <td>Woman</td>
+        </tr>
+        <tr>
+          <td>Shirts</td>
+          <td>Man</td>
+        </tr>
+        <tr>
+          <td>Youth sneakers</td>
+          <td>Teens</td>
+        </tr>
+        <tr>
+          <td>Youth sportswear</td>
+          <td>Teens</td>
+        </tr>
+        
+        
+      </tbody>
+    </table>
+    <button id="register">Register</button>
+    <button id="update">Update</button>
+    <button id="delete">Delete</button>
+    <script>
+      var deleteButton = document.querySelector("#delete");
+      var productname = document.querySelector("#productname");
+      var description = document.querySelector("#description");
+      var price = document.querySelector("#price");
+      var quantity = document.querySelector("#quantity");
+      var category = document.querySelector("#category");
+      
+      var registerButton = document.querySelector("#register");
+
+      registerButton.onclick = () => {
+        console.log(productname.value, description.value, price.value, quantity.value, category.value);
+        fetch("/api/products", {
+          method: "POST",
+          body: JSON.stringify({
+            productname: productname.value,
+            description: description.value,
+            price: price.value,
+            quantity: quantity.value,
+            category: category.value           
+          }),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(res => res.json())
+        .then(res => {
+          console.log(res);
+        });
+      }
+
+      var updateButton = document.querySelector("#update");
+
+      updateButton.onclick = () => {
+        fetch("/api/products/62579fd78f935f98f7359029", {
+          method: "PUT",
+          body: JSON.stringify({
+            productname: "修改的名字",
+            description: "添加描述",
+            price: 10000,
+            quantity: 1,         
+            category: "种类"
+          }),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(res => res.json())
+        .then(res => {
+          console.log(res);
+        });
+      }
+
+      deleteButton.onclick = () => {
+        fetch("/api/products/62579fd78f935f98f7359029", {
+          method: "DELETE"
+        })
+        .then(res => res.json())
+        .then(res => {
+          console.log(res);
+        });
+      }
+      
+
+      //获取列表
+      fetch("/api/products?page=1&limit=10")
+      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        var tbody = document.querySelector("tbody");
+        tbody.innerHTML = res.map(item => `
+          <tr>
+            <td>${item._id}</td>  
+            <td>${item.productname}</td>  
+            <td>${item.description}</td> 
+            <td>${item.price}</td>    
+            <td>${item.quantity}</td>
+            <td>${item.category}</td> 
+          </tr>
+        `).join("");
+      });
+    </script>
+  </body>
+</html>
